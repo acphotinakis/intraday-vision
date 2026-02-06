@@ -1,0 +1,100 @@
+# --- Project-level settings ---
+project:
+  # Per user instruction, this is an absolute path.
+  # For portability, this could be detected at runtime instead.
+  root: "/home/stu5/s0/acp7795/Documents/liquid_veins"
+
+# --- Shared directory structure ---
+# These are relative to the project root
+paths:
+  data: "data"
+  output: "output"
+  logs: "logs"
+
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  feature_data: "data/features"
+  metadata: "data/metadata"
+
+  plots: "output/ta_plots"
+  backtest_results: "output/backtest_results"
+
+# --- Global pipeline settings ---
+global:
+  symbols: ["SPY", "VIXY"]
+  timeframes: ["1min", "5min", "15min", "1h", "1D"]
+  # Mapping for pandas resample function
+  resample_map:
+    "1min": "1min"
+    "5min": "5min"
+    "15min": "15min"
+    "1h": "1H"
+    "1D": "1D"
+  runtime:
+    debug_mode: true
+
+# ==============================================================================
+# Pipeline-Specific Configurations
+# ==============================================================================
+
+data_ingestion:
+  years_back: 5
+  chunk_days: 365
+  adjustment: "all"
+  data_feed: "sip"
+  max_requests_per_minute: 200
+
+data_cleaning:
+  exchange: "NYSE"
+  ffill_limit: 5
+  outlier_threshold: 0.05
+
+feature_engineering:
+  windows:
+    short: 5
+    medium: 20
+    long: 60
+  hmm_states: 2
+  tail_risk_sigma: 3.0
+  vix_scale_factor: 100.0
+  versioning:
+    feature_version: "v1"
+    feature_file_template: "features_{symbol}_{timeframe}_{version}.parquet"
+
+model_training:
+  train_years: [2021, 2022, 2023, 2024]
+  test_years: [2025]
+  target_horizon: 1
+  class_threshold: 0.0
+  price_col: "SPY_close_1min"
+  # Default model params, can be overridden by optimization results
+  model_params:
+    objective: "binary:logistic"
+    eval_metric: "logloss"
+    max_depth: 4
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    n_estimators: 500
+    n_jobs: -1
+    random_state: 42
+
+model_optimization:
+  optimization_years: [2021, 2022, 2023, 2024]
+  n_features_to_select: 20
+  tuner_n_trials: 30
+  price_col: "SPY_close_1min"
+  target_horizon: 5
+  optimizer_metric: "Sharpe Ratio"
+
+backtest:
+  train_years: [2021, 2022, 2023, 2024]
+  test_years: [2025]
+  target_horizon: 5
+  price_col: "SPY_close_1min"
+  transaction_cost: 0.0000
+  allow_shorting: true
+  # Note: These thresholds are often determined by the 'optimize' pipeline
+  # and loaded dynamically, but defaults can be set here.
+  buy_threshold: 0.52
+  sell_threshold: 0.48
