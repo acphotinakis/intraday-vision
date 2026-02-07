@@ -184,6 +184,17 @@ class RateLimitedApiClient:
                 return result
 
             except Exception as e:
+                import traceback
+
+                self.logger.error(
+                    f"API call failed: {endpoint_name}",
+                    extra={
+                        "retry_count": retry_count,
+                        "exception": repr(e),
+                        "traceback": traceback.format_exc(),
+                    },
+                )
+
                 retry_count += 1
                 backoff = min(2**retry_count, 30)
 
@@ -221,100 +232,3 @@ class RateLimitedApiClient:
                 )
 
                 time.sleep(backoff)
-
-
-# import time
-# from datetime import datetime
-# from collections import deque
-# from typing import Optional, Callable, Any
-# from src.utils.app_logger import AppLogger
-
-
-# class RateLimitedApiClient:
-#     """Wraps any API client with rate limiting and logging using AppLogger"""
-
-#     def __init__(
-#         self,
-#         client,
-#         max_requests_per_minute: int = 200,
-#         logger: Optional[AppLogger] = None,
-#     ):
-#         self.client = client
-#         self.max_requests = max_requests_per_minute
-#         self.logger = logger or AppLogger(name="RateLimitedApiClient")
-#         self.timestamps = deque()  # Track request timestamps
-#         self.window_seconds = 60  # Rolling window of 60 seconds
-
-#     def _prune_old_requests(self):
-#         """Remove requests older than 60 seconds"""
-#         now = datetime.utcnow()
-#         while (
-#             self.timestamps
-#             and (now - self.timestamps[0]).total_seconds() > self.window_seconds
-#         ):
-#             self.timestamps.popleft()
-
-#     def _should_throttle(self) -> bool:
-#         """Check if we're at risk of exceeding the rate limit"""
-#         self._prune_old_requests()
-#         return len(self.timestamps) >= self.max_requests
-
-#     def _throttle(self):
-#         """Sleep until it's safe to send the next request"""
-#         now = datetime.utcnow()
-#         oldest = self.timestamps[0]
-#         sleep_time = self.window_seconds - (now - oldest).total_seconds()
-#         self.logger.warning(
-#             "Approaching rate limit, throttling requests",
-#             extra={"current_requests": len(self.timestamps), "sleep_seconds": sleep_time},
-#         )
-#         time.sleep(sleep_time + 0.01)  # tiny buffer
-
-#     def execute(
-#         self,
-#         fn: Callable[[], Any],
-#         endpoint_name: str,
-#         metadata: Optional[dict] = None,
-#         max_retries: int = 5,
-#     ) -> Any:
-#         """
-#         Wrap any API call.
-#         - fn: callable that executes the API request (e.g., lambda)
-#         - endpoint_name: descriptive string for logging
-#         - metadata: optional dict for extra info
-#         """
-#         retry_count = 0
-#         metadata = metadata or {}
-
-#         while True:
-#             if self._should_throttle():
-#                 self._throttle()
-
-#             start_time = time.time()
-#             try:
-#                 self.timestamps.append(datetime.utcnow())
-#                 result = fn()
-#                 duration_ms = int((time.time() - start_time) * 1000)
-
-#                 self.logger.info(
-#                     f"API call success: {endpoint_name}",
-#                     extra={**metadata, "duration_ms": duration_ms, "retry_count": retry_count},
-#                 )
-#                 return result
-
-#             except Exception as e:
-#                 retry_count += 1
-#                 backoff = min(2**retry_count, 30)  # exponential backoff capped at 30s
-#                 self.logger.error(
-#                     f"API call failed: {endpoint_name}",
-#                     extra={
-#                         **metadata,
-#                         "error": str(e),
-#                         "retry_count": retry_count,
-#                         "backoff_seconds": backoff,
-#                     },
-#                 )
-#                 time.sleep(backoff)
-
-#                 if retry_count >= max_retries:
-#                     raise
