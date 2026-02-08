@@ -8,6 +8,16 @@ from rich.logging import RichHandler
 from rich.panel import Panel
 from rich.syntax import Syntax
 import json
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class LoggerTheme:
+    panel_border: str = "red"
+    info_color: str = "cyan"
+    warning_color: str = "yellow"
+    error_color: str = "bold red"
+
 
 console = Console()
 
@@ -26,11 +36,14 @@ class AppLogger:
         when: str = "midnight",
         backup_count: int = 7,
         clear_existing: bool = True,
+        theme: LoggerTheme | None = None,
     ):
         self.name = name
         self.logger = logging.getLogger(name)
         self.logger.setLevel(level)
         self.logger.propagate = False  # avoid double logging
+
+        self.theme = theme or LoggerTheme()
 
         # File logging setup
         self.log_dir = log_dir or Path("./logs")
@@ -72,15 +85,21 @@ class AppLogger:
         )
         self.logger.addHandler(console_handler)
 
-    @staticmethod
-    def _format_msg(msg: str, extra: Optional[dict] = None) -> str:
+    # @staticmethod
+    def _format_msg(self, msg: str, extra: Optional[dict] = None) -> str:
         """Return the message text only for logging, render extra separately."""
         if extra:
             # Render extra metadata as a Rich Panel directly to console
             json_str = json.dumps(extra, indent=2, default=str)
+            # panel = Panel(
+            #     json_str, title="Extra Metadata", expand=False, border_style="red"
+            # )
             panel = Panel(
-                json_str, title="Extra Metadata", expand=False, border_style="red"
+                json_str,
+                title="Extra Metadata",
+                border_style=self.theme.panel_border,
             )
+
             console.print(panel)  # render the panel immediately
         return msg  # log only the plain message
 

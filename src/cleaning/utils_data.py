@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from src.config import AppConfig
-from src.utils.app_logger import AppLogger
 import matplotlib.pyplot as plt
 
 

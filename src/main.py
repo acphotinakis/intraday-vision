@@ -34,7 +34,9 @@ def cli(ctx):
     )
 
     # Set logging level based on debug_mode in YAML
-    log_level = logging.DEBUG if config.global_settings.debug_mode else logging.INFO
+    log_level = (
+        logging.DEBUG if config.global_settings.runtime.debug_mode else logging.INFO
+    )
     logging.basicConfig(level=log_level)
 
 

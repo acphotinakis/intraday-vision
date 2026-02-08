@@ -100,61 +100,6 @@ class MarketDataCleaner:
         self.logger.info("Cleaning complete.")
         return df
 
-    # def _check_ohlcv_integrity(
-    #     self, df: pd.DataFrame, symbol: str = "UNKNOWN"
-    # ) -> pd.DataFrame:
-    #     """
-    #     Perform data integrity & sanity checks on an OHLCV DataFrame.
-
-    #     Expected columns: ['timestamp', 'open', 'high', 'low', 'close', 'volume']
-    #     Returns: DataFrame with issues flagged, self.logger.infos summary of problems.
-    #     """
-
-    #     df = df.copy()
-
-    #     # Ensure 'timestamp' exists and is datetime
-    #     if "timestamp" not in df.columns:
-    #         raise ValueError("DataFrame must contain a 'timestamp' column.")
-
-    #     df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
-    #     df.sort_values("timestamp", inplace=True)
-    #     df.reset_index(drop=True, inplace=True)
-
-    #     issues = pd.DataFrame(index=df.index)
-    #     issues["missing_data"] = df.isna().any(axis=1)
-    #     issues["duplicate_row"] = df.duplicated(keep=False)
-
-    #     # Negative prices or zero volume
-    #     issues["invalid_prices"] = (df[["open", "high", "low", "close"]] < 0).any(
-    #         axis=1
-    #     )
-    #     issues["invalid_volume"] = df["volume"] < 0
-
-    #     # Price consistency: low <= open/close <= high
-    #     issues["low_gt_high"] = df["low"] > df["high"]
-    #     issues["open_out_of_bounds"] = ~df["open"].between(df["low"], df["high"])
-    #     issues["close_out_of_bounds"] = ~df["close"].between(df["low"], df["high"])
-
-    #     # Missing timestamps (detect gaps larger than expected interval)
-    #     df["timestamp_diff"] = df["timestamp"].diff()
-    #     # Estimate expected frequency
-    #     median_diff = df["timestamp_diff"].median()
-    #     issues["timestamp_gap"] = df["timestamp_diff"] > 1.5 * median_diff
-
-    #     # self.logger.info summary
-    #     self.logger.info(f"Data Integrity Report for {symbol}:")
-    #     for col in issues.columns:
-    #         n_issues = issues[col].sum()
-    #         if n_issues > 0:
-    #             self.logger.info(f"  {col}: {n_issues} rows affected")
-
-    #     # Optionally, return all problematic rows
-    #     problematic_rows = df[issues.any(axis=1)]
-
-    #     self.logger.info(f"_check_ohlcv_integrity - first 5 rows:\n{df.head()}")
-
-    #     return problematic_rows
-
     def _check_ohlcv_integrity(
         self, df: pd.DataFrame, symbol: str = "UNKNOWN"
     ) -> pd.DataFrame:

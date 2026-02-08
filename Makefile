@@ -14,7 +14,7 @@ ARGS := "" # Default to empty ARGS
 
 help:
 	@echo "==========================================================================="
-	@echo "                     Liquid Veins Pipeline Manager                     "
+	@echo "                     Stock Distro Pipeline Manager                     "
 	@echo "==========================================================================="
 	@echo "Usage:"
 	@echo "  make <target> [ARGS=\"...\" | P=\"...\"]"
