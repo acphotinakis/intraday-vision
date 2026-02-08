@@ -38,13 +38,6 @@ class DataProcessPipeline:
                 self.all_processed_files[symbol][timeframe] = results
                 sys.exit(0)
 
-        # Example cross-symbol alignment check
-        # for timeframe in self.timeframes:
-        #     spy_tf = self.all_processed_files.get("SPY", {}).get(timeframe, [])
-        #     vix_tf = self.all_processed_files.get("VIXY", {}).get(timeframe, [])
-        #     if spy_tf and vix_tf:
-        #         self.check_cross_symbol_alignment(spy_tf, vix_tf)
-
     def process_symbol_data(
         self,
         symbol: str,
@@ -278,68 +271,6 @@ class DataProcessPipeline:
         # Print table to console
         console.print(table)
         self.logger.info(f"Completed parquet summary table for {symbol}")
-
-    # def parquet_summary_table(self, symbol: str):
-    #     """
-    #     Print a Rich table summarizing all parquet files for a given stock ticker
-    #     across all timeframes.
-    #     """
-    #     console = Console()
-    #     table = Table(title=f"Parquet Logistics Summary: {symbol}")
-
-    #     # Columns
-    #     table.add_column("Timeframe", style="cyan", no_wrap=True)
-    #     table.add_column("File Name", style="magenta")
-    #     table.add_column("Rows", justify="right")
-    #     table.add_column("Columns", justify="right")
-    #     table.add_column("Index Type")
-    #     table.add_column("Memory (MB)", justify="right")
-    #     table.add_column("First Timestamp")
-    #     table.add_column("Last Timestamp")
-
-    #     symbol_dir = self.config.dirs["raw_data"] / symbol
-
-    #     if not symbol_dir.exists():
-    #         self.logger.warning(f"No directory found for symbol {symbol}: {symbol_dir}")
-    #         return
-
-    #     for timeframe in self.timeframes:
-    #         tf_dir = symbol_dir / timeframe
-    #         if not tf_dir.exists():
-    #             self.logger.warning(f"No data for {symbol} at {timeframe}")
-    #             continue
-
-    #         for file_path in sorted(tf_dir.glob("*.parquet")):
-    #             try:
-    #                 df = pd.read_parquet(file_path)
-    #                 n_rows, n_cols = df.shape
-    #                 mem_usage = df.memory_usage(deep=True).sum() / (1024**2)  # MB
-    #                 index_type = str(type(df.index))
-
-    #                 first_ts, last_ts = None, None
-    #                 if "timestamp" in df.columns:
-    #                     ts = pd.to_datetime(df["timestamp"], errors="coerce").dropna()
-    #                     if not ts.empty:
-    #                         first_ts = str(ts.min())
-    #                         last_ts = str(ts.max())
-
-    #                 table.add_row(
-    #                     timeframe,
-    #                     file_path.name,
-    #                     str(n_rows),
-    #                     str(n_cols),
-    #                     index_type,
-    #                     f"{mem_usage:.2f}",
-    #                     first_ts or "-",
-    #                     last_ts or "-",
-    #                 )
-
-    #             except Exception as e:
-    #                 self.logger.error(f"Failed to read {file_path}: {e}")
-
-    #     # Print table to console
-    #     console.print(table)
-    #     self.logger.info(f"Completed parquet summary table for {symbol}")
 
     def _load_and_merge_timeframe_files(self, raw_dir: Path) -> pd.DataFrame:
         """

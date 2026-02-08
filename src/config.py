@@ -20,6 +20,7 @@ class ProjectPaths(BaseModel):
     output: str
     logs: str
     raw_data: str
+    data_investigation: str
     processed_data: str
     corrupted_data: str
     feature_data: str
@@ -49,6 +50,7 @@ class DataIngestionConfig(BaseModel):
     adjustment: str
     data_feed: str
     max_requests_per_minute: int
+    n_stocks: int
 
 
 class DataCleaningConfig(BaseModel):
@@ -173,6 +175,26 @@ class AppConfig(BaseSettings):
                 expand=False,
             )
         )
+
+    def update_symbols(self, new_symbols: list, yaml_path: str = "src/config.yaml"):
+        """
+        Update the symbols list in memory and persist to YAML.
+        """
+        # Update in-memory
+        self.global_settings.symbols = new_symbols
+
+        # Load existing YAML
+        with open(yaml_path, "r") as f:
+            config_dict = yaml.safe_load(f)
+
+        # Update symbols in the dictionary
+        config_dict["global"]["symbols"] = new_symbols
+
+        # Write back to YAML
+        with open(yaml_path, "w") as f:
+            yaml.safe_dump(config_dict, f, sort_keys=False)
+
+        print(f"Updated symbols in config.yaml: {new_symbols}")
 
 
 # -----------------------------

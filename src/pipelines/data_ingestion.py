@@ -1,7 +1,7 @@
 from src.config import config  # Import the pre-initialized singleton
 from src.utils.app_logger import AppLogger
 from src.utils.rate_limit_api_client import RateLimitedApiClient
-from src.ingestion.alpaca_client import HistoricalDataDownloader
+from src.ingestion.alpaca_data import HistoricalDataDownloader
 from alpaca.data.historical import StockHistoricalDataClient
 
 

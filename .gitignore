@@ -11,3 +11,6 @@ logs
 
 
 src/data_cleaner copy.py
+
+src/utils/__pycache__/app_logger.cpython-311.pyc
+src/utils/__pycache__/app_logger.cpython-311.pyc
