@@ -4,12 +4,12 @@ project:
   output: output
   logs: logs
   raw_data: data/raw
-  data_investigation: data/investigation
   processed_data: data/processed
   corrupted_data: data/corrupted
   feature_data: data/features
   metadata: data/metadata
   plots: output/ta_plots
+  data_investigation: output/investigation
   backtest_results: output/backtest_results
 global:
   symbols:

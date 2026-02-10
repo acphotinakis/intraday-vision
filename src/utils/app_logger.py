@@ -189,4 +189,4 @@ class AppLogger:
         self.logger.error(self._format_msg(msg, extra))
 
     def debug(self, msg: str, extra: Optional[dict] = None):
-        self.logger.debug(self._format_msg(msg, extra))
+        self.logger.info(self._format_msg(msg, extra))

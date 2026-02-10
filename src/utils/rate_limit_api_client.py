@@ -37,7 +37,7 @@ class RateLimitedApiClient:
         now = datetime.utcnow()
         before = len(self.timestamps)
 
-        self.logger.debug(
+        self.logger.info(
             "Pruning old requests (before)",
             extra={
                 "queue_size": before,
@@ -51,7 +51,7 @@ class RateLimitedApiClient:
             and (now - self.timestamps[0]).total_seconds() > self.window_seconds
         ):
             removed = self.timestamps.popleft()
-            self.logger.debug(
+            self.logger.info(
                 "Removed expired request timestamp",
                 extra={
                     "removed_timestamp": removed.isoformat(),
@@ -61,7 +61,7 @@ class RateLimitedApiClient:
 
         after = len(self.timestamps)
 
-        self.logger.debug(
+        self.logger.info(
             "Pruning complete",
             extra={
                 "queue_size_before": before,
@@ -74,7 +74,7 @@ class RateLimitedApiClient:
 
         should = len(self.timestamps) >= self.max_requests
 
-        self.logger.debug(
+        self.logger.info(
             "Throttle check",
             extra={
                 "current_requests": len(self.timestamps),
@@ -103,7 +103,7 @@ class RateLimitedApiClient:
 
         time.sleep(sleep_time + 0.01)
 
-        self.logger.debug(
+        self.logger.info(
             "Throttle sleep complete",
             extra={"slept_seconds": sleep_time + 0.01},
         )
@@ -132,7 +132,7 @@ class RateLimitedApiClient:
         )
 
         while True:
-            self.logger.debug(
+            self.logger.info(
                 "Execution loop start",
                 extra={
                     "endpoint": endpoint_name,
@@ -147,7 +147,7 @@ class RateLimitedApiClient:
             start_wall = time.time()
             start_utc = datetime.utcnow()
 
-            self.logger.debug(
+            self.logger.info(
                 "Issuing API request",
                 extra={
                     "endpoint": endpoint_name,
@@ -158,7 +158,7 @@ class RateLimitedApiClient:
             try:
                 self.timestamps.append(start_utc)
 
-                self.logger.debug(
+                self.logger.info(
                     "Timestamp appended",
                     extra={
                         "new_queue_size": len(self.timestamps),
